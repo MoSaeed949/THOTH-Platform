@@ -1,0 +1,213 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   Theme tokens
+   Every color Tailwind uses (see tailwind.config.ts) resolves through one
+   of these custom properties. Toggling [data-theme] on <html> repaints the
+   whole app instantly — no class-per-element switching needed.
+   ========================================================================== */
+
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Backgrounds — deep navy (كحلي) */
+  --c-obsidian: 11 22 38;
+  --c-obsidian-soft: 19 31 51;
+  --c-obsidian-softer: 27 43 69;
+  --c-obsidian-line: 44 64 102;
+
+  /* Gold accent */
+  --c-gold: 201 162 39;
+  --c-gold-soft: 232 199 102;
+  --c-gold-deep: 143 109 20;
+  --c-gold-dim: 92 74 28;
+
+  /* Lapis lazuli secondary accent */
+  --c-lapis: 27 58 107;
+  --c-lapis-soft: 44 90 150;
+  --c-lapis-deep: 15 38 71;
+
+  /* Text */
+  --c-papyrus: 232 220 192;
+  --c-dusty: 169 154 122;
+
+  /* Status */
+  --c-carnelian: 155 51 36;
+  --c-fail: 182 65 46;
+
+  /* Decorative */
+  --c-grain: 232 220 192;
+  --c-embroidery: 201 162 39;
+  --embroidery-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='200' viewBox='0 0 120 200'%3E%3Cg fill='none' stroke='%23C9A227' stroke-width='1.75' stroke-linecap='round' opacity='0.55'%3E%3Ccircle cx='60' cy='34' r='11'/%3E%3Cline x1='60' y1='45' x2='60' y2='72'/%3E%3Cline x1='42' y1='58' x2='78' y2='58'/%3E%3Cline x1='30' y1='120' x2='30' y2='150'/%3E%3Cline x1='60' y1='114' x2='60' y2='156'/%3E%3Cline x1='90' y1='120' x2='90' y2='150'/%3E%3Cpath d='M22 135 L30 127 L38 135 L30 143 Z'/%3E%3Cpath d='M52 133 L60 125 L68 133 L60 141 Z'/%3E%3Cpath d='M82 135 L90 127 L98 135 L90 143 Z'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* Backgrounds — warm linen beige */
+  --c-obsidian: 228 216 189;
+  --c-obsidian-soft: 243 236 218;
+  --c-obsidian-softer: 236 227 202;
+  --c-obsidian-line: 196 178 138;
+
+  /* Gold accent, deepened for contrast on a light ground */
+  --c-gold: 154 116 20;
+  --c-gold-soft: 184 143 40;
+  --c-gold-deep: 110 82 10;
+  --c-gold-dim: 176 156 110;
+
+  /* Lapis lazuli secondary accent */
+  --c-lapis: 21 45 84;
+  --c-lapis-soft: 44 90 150;
+  --c-lapis-deep: 15 38 71;
+
+  /* Text */
+  --c-papyrus: 26 20 14;
+  --c-dusty: 90 76 56;
+
+  /* Status */
+  --c-carnelian: 139 41 28;
+  --c-fail: 150 45 30;
+
+  /* Decorative */
+  --c-grain: 26 20 14;
+  --c-embroidery: 26 20 14;
+  --embroidery-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='200' viewBox='0 0 120 200'%3E%3Cg fill='none' stroke='%231A140E' stroke-width='1.75' stroke-linecap='round' opacity='0.55'%3E%3Ccircle cx='60' cy='34' r='11'/%3E%3Cline x1='60' y1='45' x2='60' y2='72'/%3E%3Cline x1='42' y1='58' x2='78' y2='58'/%3E%3Cline x1='30' y1='120' x2='30' y2='150'/%3E%3Cline x1='60' y1='114' x2='60' y2='156'/%3E%3Cline x1='90' y1='120' x2='90' y2='150'/%3E%3Cpath d='M22 135 L30 127 L38 135 L30 143 Z'/%3E%3Cpath d='M52 133 L60 125 L68 133 L60 141 Z'/%3E%3Cpath d='M82 135 L90 127 L98 135 L90 143 Z'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+* {
+  border-color: rgb(var(--c-obsidian-line));
+}
+
+html {
+  background: rgb(var(--c-obsidian));
+}
+
+body {
+  background-color: rgb(var(--c-obsidian));
+  background-image: radial-gradient(
+    ellipse 120% 80% at 50% -10%,
+    rgb(var(--c-gold) / 0.10),
+    transparent 60%
+  );
+  background-attachment: fixed;
+  position: relative;
+}
+
+/* Vertical Egyptian embroidery texture — a fixed, low-opacity woven motif
+   sitting behind every page. Gold thread on navy in dark mode, black
+   thread on linen in light mode. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.07;
+  background-image: var(--embroidery-pattern);
+  background-repeat: repeat;
+  background-size: 120px 200px;
+}
+
+/* Real app content always paints above the embroidery layer */
+#app-root {
+  position: relative;
+  z-index: 1;
+}
+
+::selection {
+  background: rgb(var(--c-gold) / 0.35);
+  color: rgb(var(--c-papyrus));
+}
+
+:focus-visible {
+  outline: 2px solid rgb(var(--c-gold));
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ---------- Signature elements ---------- */
+
+/* Radiant sun-disc glow, echoing Thoth's halo of hieroglyphs */
+.sun-disc {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at center,
+    rgb(var(--c-gold) / 0.22) 0%,
+    rgb(var(--c-gold) / 0.08) 35%,
+    transparent 65%
+  );
+}
+
+/* Cartouche: the oval name-frame used for achievements & badges */
+.cartouche {
+  position: relative;
+  border: 2px solid rgb(var(--c-gold));
+  border-radius: 999px;
+  background: linear-gradient(
+    180deg,
+    rgb(var(--c-gold) / 0.08),
+    rgb(var(--c-gold) / 0.02)
+  );
+}
+.cartouche::before,
+.cartouche::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 60%;
+  border-radius: 3px;
+  background: rgb(var(--c-gold));
+}
+.cartouche::before {
+  left: -10px;
+}
+.cartouche::after {
+  right: -10px;
+}
+
+/* Papyrus card surface for content panels */
+.papyrus-card {
+  background-color: rgb(var(--c-obsidian-soft));
+  background-image: repeating-linear-gradient(
+    180deg,
+    rgb(var(--c-grain) / 0.025) 0px,
+    rgb(var(--c-grain) / 0.025) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  border: 1px solid rgb(var(--c-obsidian-line));
+  border-radius: 0.75rem;
+}
+
+/* Hieroglyph-style divider: repeating small glyph marks, decorative only */
+.glyph-divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(var(--c-gold-dim)),
+    transparent
+  );
+  position: relative;
+}
+
+/* Gold progress ring rotation base */
+.ring-progress {
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
