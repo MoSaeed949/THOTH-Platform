@@ -2,6 +2,12 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getAnthropicClient, buildUserContent, type ImageInput } from "@/lib/anthropic";
 
+// Claude generation can take longer than the platform's default serverless
+// timeout (~10s), which would kill the function and return an empty body the
+// client can't parse as JSON. Give it room to finish.
+export const runtime = "nodejs";
+export const maxDuration = 60;
+
 type QuizQuestion = {
   question: string;
   options: string[];

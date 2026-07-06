@@ -13,27 +13,42 @@ export default function RevisionPage() {
   const [items, setItems] = useState<Item[]>([]);
   const [title, setTitle] = useState("");
   const [dueDate, setDueDate] = useState(format(new Date(), "yyyy-MM-dd"));
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     load();
   }, []);
 
   async function load() {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("revision_items")
       .select("id, title, due_date, status")
       .order("due_date", { ascending: true });
+    if (error) {
+      setError(error.message);
+      return;
+    }
     setItems(data || []);
   }
 
   async function addItem(e: React.FormEvent) {
     e.preventDefault();
     if (!title.trim()) return;
+    setError(null);
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return;
-    await supabase.from("revision_items").insert({ user_id: user.id, title, due_date: dueDate });
+    if (!user) {
+      setError("You must be signed in to schedule a revision.");
+      return;
+    }
+    const { error } = await supabase
+      .from("revision_items")
+      .insert({ user_id: user.id, title, due_date: dueDate });
+    if (error) {
+      setError(error.message);
+      return;
+    }
     setTitle("");
     load();
   }
@@ -75,6 +90,12 @@ export default function RevisionPage() {
           Schedule
         </button>
       </form>
+
+      {error && (
+        <p className="mt-4 rounded-lg border border-fail bg-fail/5 px-4 py-2.5 text-sm text-fail">
+          Couldn&apos;t save that revision item: {error}
+        </p>
+      )}
 
       <div className="mt-6 space-y-2">
         {items.length === 0 && (

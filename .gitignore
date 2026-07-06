@@ -5,3 +5,11 @@ out/
 .env*.local
 .DS_Store
 npm-debug.log*
+
+# TestSprite local secrets & generated artifacts
+.testsprite-secret
+.testsprite/
+testsprite-plans/
+
+# TypeScript incremental build info
+tsconfig.tsbuildinfo
