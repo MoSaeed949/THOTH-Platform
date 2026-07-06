@@ -70,8 +70,24 @@ Base every question strictly on the provided material.`,
 
     let questions: QuizQuestion[];
     try {
+      // Claude sometimes wraps the array in markdown fences or a sentence of
+      // preamble ("Here are your questions:"). Strip fences first, then fall
+      // back to slicing from the first "[" to the last "]" so stray prose
+      // around the JSON array doesn't break parsing.
       const cleaned = raw.replace(/^```(?:json)?/i, "").replace(/```$/, "").trim();
-      questions = JSON.parse(cleaned);
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(cleaned);
+      } catch {
+        const start = cleaned.indexOf("[");
+        const end = cleaned.lastIndexOf("]");
+        if (start === -1 || end === -1 || end <= start) throw new Error("no JSON array found");
+        parsed = JSON.parse(cleaned.slice(start, end + 1));
+      }
+      if (!Array.isArray(parsed) || parsed.length === 0) {
+        throw new Error("parsed content is not a non-empty array");
+      }
+      questions = parsed as QuizQuestion[];
     } catch {
       return NextResponse.json(
         { error: "The mentor's quiz came back in an unexpected format. Please try again." },

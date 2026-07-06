@@ -97,13 +97,22 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       <main className="flex-1 px-4 pb-24 pt-20 md:px-10 md:pb-10 md:pt-10">{children}</main>
 
-      {/* Mobile bottom nav */}
-      <nav className="fixed inset-x-0 bottom-0 z-20 flex justify-around border-t border-obsidian-line bg-obsidian-soft py-2 md:hidden">
-        {NAV.slice(0, 5).map(({ href, icon: Icon }) => {
+      {/* Mobile bottom nav — all sections in a horizontally scrollable row so
+          Progress, Pomodoro, Achievements, and Revision stay reachable. */}
+      <nav className="fixed inset-x-0 bottom-0 z-20 flex gap-1 overflow-x-auto border-t border-obsidian-line bg-obsidian-soft px-2 py-2 md:hidden">
+        {NAV.map(({ href, label, icon: Icon }) => {
           const active = pathname === href;
           return (
-            <Link key={href} href={href} className={active ? "text-gold" : "text-dusty"}>
+            <Link
+              key={href}
+              href={href}
+              aria-label={label}
+              className={`flex shrink-0 flex-col items-center gap-0.5 px-3 py-1 text-[10px] ${
+                active ? "text-gold" : "text-dusty"
+              }`}
+            >
               <Icon className="h-5 w-5" />
+              {label}
             </Link>
           );
         })}
