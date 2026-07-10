@@ -401,6 +401,8 @@ export const ar: Messages = {
     invoicePlan: "الخطة",
     invoiceStatus: "الحالة",
     invoicePaid: "مدفوع",
+    invoiceRefunded: "مُسترد",
+    invoiceFailed: "فشل",
     downloadInvoice: "الفاتورة",
     onFreePlan: "أنت على الخطة المجانية. ترقَّ في أي وقت لفتح المزيد.",
     cancelTitle: "هل تريد إلغاء اشتراكك؟",

@@ -370,18 +370,32 @@ export default function SubscriptionPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {billing.map((row) => (
-                      <tr key={row.id} className="border-t border-obsidian-line">
-                        <td className="py-3 text-papyrus">{fmtDate(row.created_at)}</td>
-                        <td className="py-3 text-papyrus">{t.pricing.plans[row.plan_id].name}</td>
-                        <td className="py-3 text-papyrus">{formatPrice(row.amount)}</td>
-                        <td className="py-3">
-                          <span className="rounded-full bg-gold/10 px-2.5 py-0.5 text-xs text-gold">
-                            {t.subscription.invoicePaid}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
+                    {billing.map((row) => {
+                      const statusLabel =
+                        row.status === "refunded"
+                          ? t.subscription.invoiceRefunded
+                          : row.status === "failed"
+                          ? t.subscription.invoiceFailed
+                          : t.subscription.invoicePaid;
+                      const statusClass =
+                        row.status === "failed"
+                          ? "bg-fail/10 text-fail"
+                          : row.status === "refunded"
+                          ? "bg-dusty/10 text-dusty"
+                          : "bg-gold/10 text-gold";
+                      return (
+                        <tr key={row.id} className="border-t border-obsidian-line">
+                          <td className="py-3 text-papyrus">{fmtDate(row.created_at)}</td>
+                          <td className="py-3 text-papyrus">{t.pricing.plans[row.plan_id].name}</td>
+                          <td className="py-3 text-papyrus">{formatPrice(row.amount)}</td>
+                          <td className="py-3">
+                            <span className={`rounded-full px-2.5 py-0.5 text-xs ${statusClass}`}>
+                              {statusLabel}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

@@ -401,6 +401,8 @@ export const es: Messages = {
     invoicePlan: "Plan",
     invoiceStatus: "Estado",
     invoicePaid: "Pagado",
+    invoiceRefunded: "Reembolsado",
+    invoiceFailed: "Fallido",
     downloadInvoice: "Factura",
     onFreePlan: "Estás en el plan Gratis. Mejóralo en cualquier momento para desbloquear más.",
     cancelTitle: "¿Cancelar tu suscripción?",

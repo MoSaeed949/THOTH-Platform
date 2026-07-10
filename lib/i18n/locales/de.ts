@@ -401,6 +401,8 @@ export const de: Messages = {
     invoicePlan: "Tarif",
     invoiceStatus: "Status",
     invoicePaid: "Bezahlt",
+    invoiceRefunded: "Erstattet",
+    invoiceFailed: "Fehlgeschlagen",
     downloadInvoice: "Rechnung",
     onFreePlan: "Sie nutzen den kostenlosen Tarif. Upgraden Sie jederzeit, um mehr freizuschalten.",
     cancelTitle: "Ihr Abonnement kündigen?",

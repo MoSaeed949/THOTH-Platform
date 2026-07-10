@@ -401,6 +401,8 @@ export const fr: Messages = {
     invoicePlan: "Forfait",
     invoiceStatus: "Statut",
     invoicePaid: "Payé",
+    invoiceRefunded: "Remboursé",
+    invoiceFailed: "Échoué",
     downloadInvoice: "Facture",
     onFreePlan: "Vous êtes sur le forfait Gratuit. Passez à un forfait supérieur à tout moment pour débloquer plus.",
     cancelTitle: "Résilier votre abonnement ?",

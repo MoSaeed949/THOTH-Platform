@@ -403,6 +403,8 @@ export const en = {
     invoicePlan: "Plan",
     invoiceStatus: "Status",
     invoicePaid: "Paid",
+    invoiceRefunded: "Refunded",
+    invoiceFailed: "Failed",
     downloadInvoice: "Invoice",
     onFreePlan: "You're on the Free plan. Upgrade anytime to unlock more.",
     cancelTitle: "Cancel your subscription?",
