@@ -28,7 +28,10 @@ export default function ProfilePage() {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        setLoading(false);
+        return;
+      }
       setUserId(user.id);
       setEmail(user.email ?? "");
 
