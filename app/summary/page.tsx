@@ -6,6 +6,7 @@ import { AppShell } from "@/components/AppShell";
 import { format } from "date-fns";
 import Link from "next/link";
 import { AttachmentButton, AttachmentThumbnails, type AttachedImage } from "@/components/AttachmentButton";
+import { useI18n } from "@/components/I18nProvider";
 
 type Summary = {
   id: string;
@@ -17,6 +18,7 @@ type Summary = {
 
 export default function SummaryPage() {
   const supabase = createClient();
+  const { t, fmt } = useI18n();
   const [title, setTitle] = useState("");
   const [sourceText, setSourceText] = useState("");
   const [images, setImages] = useState<AttachedImage[]>([]);
@@ -43,7 +45,7 @@ export default function SummaryPage() {
     e.preventDefault();
     setError(null);
     if (!sourceText.trim() && images.length === 0) {
-      setError("Paste some material or attach a file/image first.");
+      setError(t.summary.errorEmpty);
       return;
     }
     setLoading(true);
@@ -58,7 +60,7 @@ export default function SummaryPage() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to generate summary.");
+      if (!res.ok) throw new Error(data.error || t.summary.errorGenerate);
       setSelected(data.summary);
       setTitle("");
       setSourceText("");
@@ -73,27 +75,27 @@ export default function SummaryPage() {
 
   return (
     <AppShell>
-      <h1 className="font-display text-3xl text-papyrus">Summaries</h1>
-      <p className="mt-1 text-dusty">Paste your notes. Thoth will distill them.</p>
+      <h1 className="font-display text-3xl text-papyrus">{t.summary.title}</h1>
+      <p className="mt-1 text-dusty">{t.summary.subtitle}</p>
 
       <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-5">
         <form onSubmit={handleGenerate} className="papyrus-card p-6 lg:col-span-2">
           <label className="block text-sm text-dusty">
-            Title
+            {t.summary.titleLabel}
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. Chapter 4 — Thermodynamics"
+              placeholder={t.summary.titlePlaceholder}
               className="mt-1 w-full rounded-lg border border-obsidian-line bg-obsidian px-4 py-2.5 text-papyrus outline-none focus:border-gold"
             />
           </label>
           <label className="mt-4 block text-sm text-dusty">
-            Study material
+            {t.summary.materialLabel}
             <textarea
               value={sourceText}
               onChange={(e) => setSourceText(e.target.value)}
               rows={10}
-              placeholder="Paste your notes, textbook excerpt, or lecture transcript here… or attach a file below"
+              placeholder={t.summary.materialPlaceholder}
               className="mt-1 w-full rounded-lg border border-obsidian-line bg-obsidian px-4 py-2.5 text-papyrus outline-none focus:border-gold"
             />
           </label>
@@ -107,7 +109,7 @@ export default function SummaryPage() {
                   setSourceText((prev) => (prev ? `${prev}\n\n--- ${filename} ---\n${text}` : text))
                 }
               />
-              <span className="text-xs text-dusty">Attach a photo, PDF, DOCX, or text file</span>
+              <span className="text-xs text-dusty">{t.summary.attachHint}</span>
             </div>
           </div>
 
@@ -117,7 +119,7 @@ export default function SummaryPage() {
             disabled={loading}
             className="mt-4 w-full rounded-full bg-gold py-2.5 font-semibold text-ink transition hover:bg-gold-soft disabled:opacity-50"
           >
-            {loading ? "Thoth is writing…" : "Generate summary"}
+            {loading ? t.summary.generating : t.summary.generate}
           </button>
         </form>
 
@@ -127,7 +129,7 @@ export default function SummaryPage() {
               <div className="flex items-center justify-between">
                 <h2 className="font-display text-xl text-gold">{selected.title}</h2>
                 <button onClick={() => setSelected(null)} className="text-xs text-dusty hover:text-gold">
-                  Close
+                  {t.common.close}
                 </button>
               </div>
               <div className="prose prose-invert mt-4 max-w-none whitespace-pre-wrap text-sm text-papyrus">
@@ -137,16 +139,16 @@ export default function SummaryPage() {
                 href={{ pathname: "/quiz", query: { summaryId: selected.id } }}
                 className="mt-6 inline-block rounded-full border border-gold-dim px-6 py-2 text-sm text-papyrus hover:border-gold"
               >
-                Turn into a quiz →
+                {t.summary.turnIntoQuiz}
               </Link>
             </div>
           ) : (
             <div className="papyrus-card p-6">
-              <h2 className="font-display text-lg text-gold">Your summaries</h2>
+              <h2 className="font-display text-lg text-gold">{t.summary.yourSummaries}</h2>
               {loadingList ? (
-                <p className="mt-4 text-sm text-dusty">Reading the scrolls…</p>
+                <p className="mt-4 text-sm text-dusty">{t.summary.loadingScrolls}</p>
               ) : summaries.length === 0 ? (
-                <p className="mt-4 text-sm text-dusty">No summaries yet — write your first one.</p>
+                <p className="mt-4 text-sm text-dusty">{t.summary.noSummaries}</p>
               ) : (
                 <ul className="mt-4 space-y-2">
                   {summaries.map((s) => (

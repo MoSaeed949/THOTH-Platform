@@ -5,15 +5,17 @@ import { createClient } from "@/lib/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { ProgressRing } from "@/components/ProgressRing";
 import { EyeOfHorusIcon } from "@/components/icons";
+import { useI18n } from "@/components/I18nProvider";
 
-const PRESETS = [
-  { label: "Focus", minutes: 25 },
-  { label: "Short break", minutes: 5 },
-  { label: "Long break", minutes: 15 },
+const PRESETS: { labelKey: "focus" | "shortBreak" | "longBreak"; minutes: number }[] = [
+  { labelKey: "focus", minutes: 25 },
+  { labelKey: "shortBreak", minutes: 5 },
+  { labelKey: "longBreak", minutes: 15 },
 ];
 
 export default function PomodoroPage() {
   const supabase = createClient();
+  const { t, fmt } = useI18n();
   const [durationMinutes, setDurationMinutes] = useState(25);
   const [secondsLeft, setSecondsLeft] = useState(25 * 60);
   const [running, setRunning] = useState(false);
@@ -95,33 +97,33 @@ export default function PomodoroPage() {
 
   return (
     <AppShell>
-      <h1 className="font-display text-3xl text-papyrus">Pomodoro</h1>
-      <p className="mt-1 text-dusty">Focused sessions, timed and logged automatically.</p>
+      <h1 className="font-display text-3xl text-papyrus">{t.pomodoro.title}</h1>
+      <p className="mt-1 text-dusty">{t.pomodoro.subtitle}</p>
 
       <div className="mt-8 flex flex-col items-center">
         <EyeOfHorusIcon className="mb-6 h-10 w-16 text-gold-dim" />
 
-        <ProgressRing progress={progress} size={260} strokeWidth={12} label={`${mm}:${ss}`} sublabel={`${durationMinutes} min`} />
+        <ProgressRing progress={progress} size={260} strokeWidth={12} label={`${mm}:${ss}`} sublabel={fmt(t.pomodoro.minutesShort, { count: durationMinutes })} />
 
         <div className="mt-8 flex gap-3">
           <button
             onClick={toggle}
             className="rounded-full bg-gold px-10 py-3 font-semibold text-ink hover:bg-gold-soft"
           >
-            {running ? "Pause" : secondsLeft === 0 ? "Start again" : "Start"}
+            {running ? t.pomodoro.pause : secondsLeft === 0 ? t.pomodoro.startAgain : t.pomodoro.start}
           </button>
           <button
             onClick={reset}
             className="rounded-full border border-gold-dim px-6 py-3 text-papyrus hover:border-gold"
           >
-            Reset
+            {t.pomodoro.reset}
           </button>
         </div>
 
         <div className="mt-8 flex gap-3">
           {PRESETS.map((p) => (
             <button
-              key={p.label}
+              key={p.labelKey}
               onClick={() => selectPreset(p.minutes)}
               className={`rounded-full border px-4 py-2 text-xs transition ${
                 durationMinutes === p.minutes
@@ -129,13 +131,13 @@ export default function PomodoroPage() {
                   : "border-obsidian-line text-dusty hover:border-gold-dim"
               }`}
             >
-              {p.label} · {p.minutes}m
+              {fmt(t.pomodoro.presetLabel, { label: t.pomodoro[p.labelKey], minutes: p.minutes })}
             </button>
           ))}
         </div>
 
         <p className="mt-8 text-sm text-dusty">
-          {sessionsToday} focus session{sessionsToday === 1 ? "" : "s"} completed today
+          {fmt(sessionsToday === 1 ? t.pomodoro.sessionCompleted : t.pomodoro.sessionsCompleted, { count: sessionsToday })}
         </p>
       </div>
     </AppShell>

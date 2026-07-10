@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { format } from "date-fns";
 import { AttachmentButton, AttachmentThumbnails, type AttachedImage } from "@/components/AttachmentButton";
+import { useI18n } from "@/components/I18nProvider";
 
 type Question = {
   question: string;
@@ -17,6 +18,7 @@ type Quiz = { id: string; title: string; questions: Question[]; created_at: stri
 
 function QuizInner() {
   const supabase = createClient();
+  const { t, fmt } = useI18n();
   const searchParams = useSearchParams();
   const summaryId = searchParams.get("summaryId");
 
@@ -41,7 +43,7 @@ function QuizInner() {
           .eq("id", summaryId)
           .single();
         if (data) {
-          setTitle(`Quiz — ${data.title}`);
+          setTitle(fmt(t.quiz.quizForSummary, { title: data.title }));
           setSourceText(data.summary_text);
         }
       }
@@ -61,7 +63,7 @@ function QuizInner() {
     e.preventDefault();
     setError(null);
     if (!sourceText.trim() && images.length === 0) {
-      setError("Paste some material or attach a file/image first.");
+      setError(t.quiz.errorEmpty);
       return;
     }
     setLoading(true);
@@ -78,7 +80,7 @@ function QuizInner() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to generate quiz.");
+      if (!res.ok) throw new Error(data.error || t.quiz.errorGenerate);
       startQuiz(data.quiz);
       setImages([]);
       loadQuizzes();
@@ -123,15 +125,15 @@ function QuizInner() {
 
   return (
     <AppShell>
-      <h1 className="font-display text-3xl text-papyrus">Quizzes</h1>
-      <p className="mt-1 text-dusty">Be tested on what you've studied. Fix what you missed.</p>
+      <h1 className="font-display text-3xl text-papyrus">{t.quiz.title}</h1>
+      <p className="mt-1 text-dusty">{t.quiz.subtitle}</p>
 
       {activeQuiz ? (
         <div className="mt-8 papyrus-card p-6">
           <div className="flex items-center justify-between">
             <h2 className="font-display text-xl text-gold">{activeQuiz.title}</h2>
             <button onClick={() => setActiveQuiz(null)} className="text-xs text-dusty hover:text-gold">
-              Back to quizzes
+              {t.quiz.backToQuizzes}
             </button>
           </div>
 
@@ -182,7 +184,7 @@ function QuizInner() {
               <p className="font-display text-2xl text-gold">
                 {score}/{activeQuiz.questions.length}
               </p>
-              <p className="text-sm text-dusty">Score recorded to your progress.</p>
+              <p className="text-sm text-dusty">{t.quiz.scoreRecorded}</p>
             </div>
           ) : (
             <button
@@ -190,7 +192,7 @@ function QuizInner() {
               disabled={answers.includes(-1)}
               className="mt-8 w-full rounded-full bg-gold py-2.5 font-semibold text-ink transition hover:bg-gold-soft disabled:opacity-40"
             >
-              Submit answers
+              {t.quiz.submitAnswers}
             </button>
           )}
         </div>
@@ -198,21 +200,21 @@ function QuizInner() {
         <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-5">
           <form onSubmit={handleGenerate} className="papyrus-card p-6 lg:col-span-2">
             <label className="block text-sm text-dusty">
-              Title
+              {t.quiz.titleLabel}
               <input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g. Quiz — Chapter 4"
+                placeholder={t.quiz.titlePlaceholder}
                 className="mt-1 w-full rounded-lg border border-obsidian-line bg-obsidian px-4 py-2.5 text-papyrus outline-none focus:border-gold"
               />
             </label>
             <label className="mt-4 block text-sm text-dusty">
-              Study material
+              {t.quiz.materialLabel}
               <textarea
                 value={sourceText}
                 onChange={(e) => setSourceText(e.target.value)}
                 rows={8}
-                placeholder="Paste notes, generate a summary first and send it here, or attach a file below…"
+                placeholder={t.quiz.materialPlaceholder}
                 className="mt-1 w-full rounded-lg border border-obsidian-line bg-obsidian px-4 py-2.5 text-papyrus outline-none focus:border-gold"
               />
             </label>
@@ -226,12 +228,12 @@ function QuizInner() {
                     setSourceText((prev) => (prev ? `${prev}\n\n--- ${filename} ---\n${text}` : text))
                   }
                 />
-                <span className="text-xs text-dusty">Attach a photo, PDF, DOCX, or text file</span>
+                <span className="text-xs text-dusty">{t.quiz.attachHint}</span>
               </div>
             </div>
 
             <label className="mt-4 block text-sm text-dusty">
-              Number of questions
+              {t.quiz.numQuestions}
               <input
                 type="number"
                 min={3}
@@ -247,14 +249,14 @@ function QuizInner() {
               disabled={loading}
               className="mt-4 w-full rounded-full bg-gold py-2.5 font-semibold text-ink transition hover:bg-gold-soft disabled:opacity-50"
             >
-              {loading ? "Thoth is composing questions…" : "Generate quiz"}
+              {loading ? t.quiz.generating : t.quiz.generate}
             </button>
           </form>
 
           <div className="papyrus-card p-6 lg:col-span-3">
-            <h2 className="font-display text-lg text-gold">Your quizzes</h2>
+            <h2 className="font-display text-lg text-gold">{t.quiz.yourQuizzes}</h2>
             {quizzes.length === 0 ? (
-              <p className="mt-4 text-sm text-dusty">No quizzes yet — generate your first one.</p>
+              <p className="mt-4 text-sm text-dusty">{t.quiz.noQuizzes}</p>
             ) : (
               <ul className="mt-4 space-y-2">
                 {quizzes.map((q) => (

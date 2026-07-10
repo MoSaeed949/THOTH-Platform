@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { AppShell } from "@/components/AppShell";
+import { useI18n } from "@/components/I18nProvider";
 import { addDays } from "date-fns";
 
 type Deck = { id: string; title: string; created_at: string };
@@ -18,6 +19,7 @@ type Card = {
 
 export default function FlashcardsPage() {
   const supabase = createClient();
+  const { t, fmt } = useI18n();
   const [decks, setDecks] = useState<Deck[]>([]);
   const [activeDeck, setActiveDeck] = useState<Deck | null>(null);
   const [cards, setCards] = useState<Card[]>([]);
@@ -137,21 +139,21 @@ export default function FlashcardsPage() {
 
   return (
     <AppShell>
-      <h1 className="font-display text-3xl text-papyrus">Flashcards</h1>
-      <p className="mt-1 text-dusty">Review what tends to slip, on a schedule that adapts.</p>
+      <h1 className="font-display text-3xl text-papyrus">{t.flashcards.title}</h1>
+      <p className="mt-1 text-dusty">{t.flashcards.subtitle}</p>
 
       {!activeDeck ? (
         <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
           <form onSubmit={handleCreateDeck} className="papyrus-card p-6">
-            <h2 className="font-display text-lg text-gold">New deck</h2>
+            <h2 className="font-display text-lg text-gold">{t.flashcards.newDeck}</h2>
             <input
               value={newDeckTitle}
               onChange={(e) => setNewDeckTitle(e.target.value)}
-              placeholder="e.g. Organic Chemistry"
+              placeholder={t.flashcards.deckTitlePlaceholder}
               className="mt-3 w-full rounded-lg border border-obsidian-line bg-obsidian px-4 py-2.5 text-papyrus outline-none focus:border-gold"
             />
             <button className="mt-3 w-full rounded-full bg-gold py-2.5 font-semibold text-ink hover:bg-gold-soft">
-              Create deck
+              {t.flashcards.createDeck}
             </button>
           </form>
 
@@ -162,7 +164,7 @@ export default function FlashcardsPage() {
               className="papyrus-card p-6 text-left transition hover:border-gold"
             >
               <h2 className="font-display text-lg text-gold">{deck.title}</h2>
-              <p className="mt-1 text-sm text-dusty">Open deck →</p>
+              <p className="mt-1 text-sm text-dusty">{t.flashcards.openDeck}</p>
             </button>
           ))}
         </div>
@@ -172,7 +174,7 @@ export default function FlashcardsPage() {
             onClick={() => setReviewing(false)}
             className="mb-4 text-xs text-dusty hover:text-gold"
           >
-            ← Exit review
+            {t.flashcards.exitReview}
           </button>
           <div
             onClick={() => setFlipped(!flipped)}
@@ -183,7 +185,7 @@ export default function FlashcardsPage() {
             </p>
           </div>
           <p className="mt-2 text-center text-xs text-dusty">
-            Card {reviewIndex + 1} of {reviewQueue.length} — tap to flip
+            {fmt(t.flashcards.cardXofY, { current: reviewIndex + 1, total: reviewQueue.length })}
           </p>
           {flipped && (
             <div className="mt-4 grid grid-cols-3 gap-3">
@@ -191,19 +193,19 @@ export default function FlashcardsPage() {
                 onClick={() => rate("again")}
                 className="rounded-full border border-fail py-2.5 text-sm text-fail hover:bg-fail/10"
               >
-                Again
+                {t.flashcards.again}
               </button>
               <button
                 onClick={() => rate("good")}
                 className="rounded-full border border-gold py-2.5 text-sm text-gold hover:bg-gold/10"
               >
-                Good
+                {t.flashcards.good}
               </button>
               <button
                 onClick={() => rate("easy")}
                 className="rounded-full border border-lapis-soft py-2.5 text-sm text-lapis-soft hover:bg-lapis/10"
               >
-                Easy
+                {t.flashcards.easy}
               </button>
             </div>
           )}
@@ -214,7 +216,7 @@ export default function FlashcardsPage() {
             onClick={() => setActiveDeck(null)}
             className="mb-4 text-xs text-dusty hover:text-gold"
           >
-            ← All decks
+            {t.flashcards.allDecks}
           </button>
           <div className="flex items-center justify-between">
             <h2 className="font-display text-2xl text-papyrus">{activeDeck.title}</h2>
@@ -223,7 +225,7 @@ export default function FlashcardsPage() {
                 onClick={startReview}
                 className="rounded-full bg-gold px-6 py-2 text-sm font-semibold text-ink hover:bg-gold-soft"
               >
-                Start review ({cards.length})
+                {fmt(t.flashcards.startReview, { count: cards.length })}
               </button>
             )}
           </div>
@@ -232,17 +234,17 @@ export default function FlashcardsPage() {
             <input
               value={front}
               onChange={(e) => setFront(e.target.value)}
-              placeholder="Front (question / term)"
+              placeholder={t.flashcards.frontPlaceholder}
               className="rounded-lg border border-obsidian-line bg-obsidian px-4 py-2.5 text-papyrus outline-none focus:border-gold"
             />
             <input
               value={back}
               onChange={(e) => setBack(e.target.value)}
-              placeholder="Back (answer / definition)"
+              placeholder={t.flashcards.backPlaceholder}
               className="rounded-lg border border-obsidian-line bg-obsidian px-4 py-2.5 text-papyrus outline-none focus:border-gold"
             />
             <button className="sm:col-span-2 rounded-full border border-gold-dim py-2.5 text-sm text-papyrus hover:border-gold">
-              Add card
+              {t.flashcards.addCard}
             </button>
           </form>
 

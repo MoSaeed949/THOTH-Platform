@@ -6,11 +6,13 @@ import { createClient } from "@/lib/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { Send } from "lucide-react";
 import { AttachmentButton, AttachmentThumbnails, type AttachedImage } from "@/components/AttachmentButton";
+import { useI18n } from "@/components/I18nProvider";
 
 type Message = { role: "user" | "assistant"; content: string; imagePreviews?: string[] };
 
 export default function MentorPage() {
   const supabase = createClient();
+  const { t } = useI18n();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [images, setImages] = useState<AttachedImage[]>([]);
@@ -41,7 +43,7 @@ export default function MentorPage() {
       ...m,
       {
         role: "user",
-        content: userMessage || "(shared an image)",
+        content: userMessage || t.mentor.sharedImage,
         imagePreviews: attachedImages.map((i) => i.previewUrl),
       },
     ]);
@@ -56,7 +58,7 @@ export default function MentorPage() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Thoth could not respond.");
+      if (!res.ok) throw new Error(data.error || t.mentor.errorRespond);
       setMessages((m) => [...m, { role: "assistant", content: data.reply }]);
     } catch (err: any) {
       setMessages((m) => [...m, { role: "assistant", content: `⚠️ ${err.message}` }]);
@@ -69,11 +71,11 @@ export default function MentorPage() {
     <AppShell>
       <div className="flex items-center gap-3">
         <div className="relative h-12 w-12 overflow-hidden rounded-full border-2 border-gold">
-          <Image src="/images/thoth-hero.png" alt="Thoth" fill className="object-cover" />
+          <Image src="/images/thoth-hero.png" alt={t.mentor.thothAlt} fill className="object-cover" />
         </div>
         <div>
-          <h1 className="font-display text-2xl text-papyrus">Ask Thoth</h1>
-          <p className="text-sm text-dusty">Your mentor, patient and precise.</p>
+          <h1 className="font-display text-2xl text-papyrus">{t.mentor.title}</h1>
+          <p className="text-sm text-dusty">{t.mentor.subtitle}</p>
         </div>
       </div>
 
@@ -83,7 +85,7 @@ export default function MentorPage() {
       >
         {messages.length === 0 && (
           <p className="text-sm text-dusty">
-            Ask about anything you're studying, paste a passage, or attach a photo of your notes.
+            {t.mentor.emptyPrompt}
           </p>
         )}
         {messages.map((m, i) => (
@@ -99,14 +101,14 @@ export default function MentorPage() {
               <div className="mb-2 flex gap-2">
                 {m.imagePreviews.map((src, j) => (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img key={j} src={src} alt="attachment" className="h-16 w-16 rounded-lg object-cover" />
+                  <img key={j} src={src} alt={t.mentor.attachmentAlt} className="h-16 w-16 rounded-lg object-cover" />
                 ))}
               </div>
             )}
             {m.content}
           </div>
         ))}
-        {sending && <p className="text-xs text-dusty">Thoth is considering…</p>}
+        {sending && <p className="text-xs text-dusty">{t.mentor.considering}</p>}
       </div>
 
       <div className="mt-4">
@@ -120,7 +122,7 @@ export default function MentorPage() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && send()}
-            placeholder="Ask a question…"
+            placeholder={t.mentor.askPlaceholder}
             className="flex-1 rounded-full border border-obsidian-line bg-obsidian-soft px-5 py-3 text-papyrus outline-none focus:border-gold"
           />
           <button

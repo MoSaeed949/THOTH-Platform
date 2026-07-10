@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { AppShell } from "@/components/AppShell";
+import { useI18n } from "@/components/I18nProvider";
 import {
   ResponsiveContainer,
   LineChart,
@@ -18,6 +19,7 @@ import { format, subDays } from "date-fns";
 
 export default function ProgressPage() {
   const supabase = createClient();
+  const { t } = useI18n();
   const [quizData, setQuizData] = useState<{ date: string; pct: number }[]>([]);
   const [focusData, setFocusData] = useState<{ date: string; minutes: number }[]>([]);
   const [totals, setTotals] = useState({ quizzes: 0, avgScore: 0, focusMinutes: 0 });
@@ -81,28 +83,28 @@ export default function ProgressPage() {
 
   return (
     <AppShell>
-      <h1 className="font-display text-3xl text-papyrus">Progress</h1>
-      <p className="mt-1 text-dusty">Your study time, scores, and streaks — in one place.</p>
+      <h1 className="font-display text-3xl text-papyrus">{t.progress.title}</h1>
+      <p className="mt-1 text-dusty">{t.progress.subtitle}</p>
 
       <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-3">
         <div className="papyrus-card p-6 text-center">
           <p className="font-display text-3xl text-gold">{totals.quizzes}</p>
-          <p className="text-sm text-dusty">Quizzes (14d)</p>
+          <p className="text-sm text-dusty">{t.progress.quizzes14d}</p>
         </div>
         <div className="papyrus-card p-6 text-center">
           <p className="font-display text-3xl text-gold">{totals.avgScore}%</p>
-          <p className="text-sm text-dusty">Average score</p>
+          <p className="text-sm text-dusty">{t.progress.avgScore}</p>
         </div>
         <div className="papyrus-card p-6 text-center">
           <p className="font-display text-3xl text-gold">{totals.focusMinutes}</p>
-          <p className="text-sm text-dusty">Focus minutes</p>
+          <p className="text-sm text-dusty">{t.progress.focusMinutes}</p>
         </div>
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="papyrus-card p-6">
-          <h2 className="font-display text-lg text-gold">Quiz score trend</h2>
-          <div className="mt-4 h-64">
+          <h2 className="font-display text-lg text-gold">{t.progress.quizTrend}</h2>
+          <div className="mt-4 h-64 chart-ltr">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={quizData}>
                 <CartesianGrid stroke="rgb(var(--c-obsidian-line))" strokeDasharray="3 3" />
@@ -122,8 +124,8 @@ export default function ProgressPage() {
         </div>
 
         <div className="papyrus-card p-6">
-          <h2 className="font-display text-lg text-gold">Focus minutes per day</h2>
-          <div className="mt-4 h-64">
+          <h2 className="font-display text-lg text-gold">{t.progress.focusPerDay}</h2>
+          <div className="mt-4 h-64 chart-ltr">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={focusData}>
                 <CartesianGrid stroke="rgb(var(--c-obsidian-line))" strokeDasharray="3 3" />
