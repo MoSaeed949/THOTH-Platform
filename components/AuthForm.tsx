@@ -10,12 +10,13 @@ import { Button } from "@/components/ui/Button";
 export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const router = useRouter();
   const supabase = createClient();
-  const { t } = useI18n();
+  const { t, fmt } = useI18n();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [confirmationEmail, setConfirmationEmail] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -23,13 +24,17 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     setLoading(true);
 
     if (mode === "signup") {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: { data: { full_name: fullName } },
       });
       setLoading(false);
       if (error) return setError(error.message);
+      // When email confirmation is enabled, signUp returns no session and no
+      // cookie is set, so navigating to /dashboard would bounce back to /login
+      // with no explanation. Show a "confirm your email" state instead.
+      if (!data.session) return setConfirmationEmail(email);
       router.push("/dashboard");
       router.refresh();
     } else {
@@ -43,6 +48,23 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
 
   const inputClass =
     "mt-1 w-full rounded-lg border border-obsidian-line bg-obsidian px-4 py-2.5 text-papyrus outline-none transition focus:border-gold";
+
+  if (confirmationEmail) {
+    return (
+      <div className="papyrus-card w-full max-w-sm p-8">
+        <h1 className="font-display text-2xl text-gold">{t.auth.checkEmailTitle}</h1>
+        <p className="mt-4 text-sm text-dusty">
+          {fmt(t.auth.checkEmailBody, { email: confirmationEmail })}
+        </p>
+        <Link
+          href="/login"
+          className="mt-6 inline-block text-sm text-gold hover:underline"
+        >
+          {t.auth.backToLogin}
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="papyrus-card w-full max-w-sm p-8">

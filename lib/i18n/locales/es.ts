@@ -129,6 +129,9 @@ export const es: Messages = {
     createOne: "Crea una cuenta",
     alreadyHave: "¿Ya tienes una cuenta?",
     signInLink: "Iniciar sesión",
+    checkEmailTitle: "Confirma tu correo electrónico",
+    checkEmailBody: "Enviamos un enlace de confirmación a {email}. Haz clic en él y luego inicia sesión.",
+    backToLogin: "Volver a iniciar sesión",
   },
 
   dashboard: {

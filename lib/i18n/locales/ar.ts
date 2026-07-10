@@ -129,6 +129,9 @@ export const ar: Messages = {
     createOne: "أنشئ حسابًا",
     alreadyHave: "لديك حساب بالفعل؟",
     signInLink: "تسجيل الدخول",
+    checkEmailTitle: "أكّد بريدك الإلكتروني",
+    checkEmailBody: "أرسلنا رابط تأكيد إلى {email}. اضغط عليه ثم سجّل الدخول.",
+    backToLogin: "العودة إلى تسجيل الدخول",
   },
 
   dashboard: {

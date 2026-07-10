@@ -131,6 +131,9 @@ export const en = {
     createOne: "Create an account",
     alreadyHave: "Already have an account?",
     signInLink: "Sign in",
+    checkEmailTitle: "Confirm your email",
+    checkEmailBody: "We sent a confirmation link to {email}. Click it, then sign in.",
+    backToLogin: "Back to sign in",
   },
 
   dashboard: {

@@ -129,6 +129,9 @@ export const de: Messages = {
     createOne: "Konto erstellen",
     alreadyHave: "Sie haben bereits ein Konto?",
     signInLink: "Anmelden",
+    checkEmailTitle: "Bestätigen Sie Ihre E-Mail",
+    checkEmailBody: "Wir haben einen Bestätigungslink an {email} gesendet. Klicken Sie darauf und melden Sie sich dann an.",
+    backToLogin: "Zurück zur Anmeldung",
   },
 
   dashboard: {
