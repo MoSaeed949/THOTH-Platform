@@ -81,7 +81,7 @@ export async function activatePlan(
   const now = new Date();
   const end = periodEnd(cycle, now);
 
-  await supabase.from("subscriptions").upsert(
+  const { error: subError } = await supabase.from("subscriptions").upsert(
     {
       user_id: userId,
       plan_id: planId,
@@ -94,11 +94,12 @@ export async function activatePlan(
     },
     { onConflict: "user_id" }
   );
+  if (subError) throw subError;
 
   const plan = getPlan(planId);
   const amount = cycleTotal(plan, cycle);
   if (amount > 0) {
-    await supabase.from("billing_history").insert({
+    const { error: billError } = await supabase.from("billing_history").insert({
       user_id: userId,
       plan_id: planId,
       billing_cycle: cycle,
@@ -108,6 +109,7 @@ export async function activatePlan(
       period_start: now.toISOString(),
       period_end: end.toISOString(),
     });
+    if (billError) throw billError;
   }
 }
 
@@ -126,10 +128,11 @@ export async function cancelAtPeriodEnd(
   supabase: SupabaseClient,
   userId: string
 ): Promise<void> {
-  await supabase
+  const { error } = await supabase
     .from("subscriptions")
     .update({ cancel_at_period_end: true, updated_at: new Date().toISOString() })
     .eq("user_id", userId);
+  if (error) throw error;
 }
 
 /** Undo a scheduled cancellation. */
@@ -137,10 +140,11 @@ export async function resumeSubscription(
   supabase: SupabaseClient,
   userId: string
 ): Promise<void> {
-  await supabase
+  const { error } = await supabase
     .from("subscriptions")
     .update({ cancel_at_period_end: false, status: "active", updated_at: new Date().toISOString() })
     .eq("user_id", userId);
+  if (error) throw error;
 }
 
 /** Immediately move the user back to the Free plan. */
@@ -149,7 +153,7 @@ export async function downgradeToFree(
   userId: string
 ): Promise<void> {
   const now = new Date();
-  await supabase.from("subscriptions").upsert(
+  const { error } = await supabase.from("subscriptions").upsert(
     {
       user_id: userId,
       plan_id: "free",
@@ -162,4 +166,5 @@ export async function downgradeToFree(
     },
     { onConflict: "user_id" }
   );
+  if (error) throw error;
 }
