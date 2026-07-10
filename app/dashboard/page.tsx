@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { ProgressRing } from "@/components/ProgressRing";
 import { AnkhIcon } from "@/components/icons";
+import { useI18n } from "@/components/I18nProvider";
 import { format } from "date-fns";
 
 type RevisionItem = { id: string; title: string; due_date: string; status: string };
@@ -14,6 +15,7 @@ type StudyPlan = { id: string; subject: string; tasks: { title: string; done: bo
 
 export default function DashboardPage() {
   const supabase = createClient();
+  const { t, fmt } = useI18n();
   const [name, setName] = useState<string>("");
   const [streak, setStreak] = useState(0);
   const [dueToday, setDueToday] = useState<RevisionItem[]>([]);
@@ -27,7 +29,10 @@ export default function DashboardPage() {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        setLoading(false);
+        return;
+      }
 
       const { data: profile } = await supabase
         .from("profiles")
@@ -96,16 +101,18 @@ export default function DashboardPage() {
   return (
     <AppShell>
       <h1 className="font-display text-3xl text-papyrus">
-        {name ? `Welcome back, ${name}` : "Welcome back"}
+        {name ? fmt(t.dashboard.welcomeName, { name }) : t.dashboard.welcome}
       </h1>
-      <p className="mt-1 text-dusty">Here is where your path stands today.</p>
+      <p className="mt-1 text-dusty">{t.dashboard.subtitle}</p>
 
       <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
         <div className="papyrus-card flex items-center gap-4 p-6">
           <AnkhIcon className="h-10 w-10 text-gold" />
           <div>
-            <p className="text-2xl font-semibold text-papyrus">{streak} day{streak === 1 ? "" : "s"}</p>
-            <p className="text-sm text-dusty">Current streak</p>
+            <p className="text-2xl font-semibold text-papyrus">
+              {fmt(streak === 1 ? t.dashboard.streakDay : t.dashboard.streakDays, { count: streak })}
+            </p>
+            <p className="text-sm text-dusty">{t.dashboard.streak}</p>
           </div>
         </div>
 
@@ -115,7 +122,7 @@ export default function DashboardPage() {
             <p className="text-2xl font-semibold text-papyrus">
               {doneTasks}/{totalTasks || 0}
             </p>
-            <p className="text-sm text-dusty">Study plan tasks done</p>
+            <p className="text-sm text-dusty">{t.dashboard.planTasksDone}</p>
           </div>
         </div>
 
@@ -124,8 +131,8 @@ export default function DashboardPage() {
             {pomodoroCount}
           </div>
           <div>
-            <p className="text-2xl font-semibold text-papyrus">Focus sessions</p>
-            <p className="text-sm text-dusty">Completed today</p>
+            <p className="text-2xl font-semibold text-papyrus">{t.dashboard.focusSessions}</p>
+            <p className="text-sm text-dusty">{t.dashboard.completedToday}</p>
           </div>
         </div>
       </div>
@@ -133,15 +140,15 @@ export default function DashboardPage() {
       <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="papyrus-card p-6">
           <div className="flex items-center justify-between">
-            <h2 className="font-display text-lg text-gold">Due for revision</h2>
+            <h2 className="font-display text-lg text-gold">{t.dashboard.dueForRevision}</h2>
             <Link href="/revision" className="text-xs text-dusty hover:text-gold">
-              View all
+              {t.common.viewAll}
             </Link>
           </div>
           {loading ? (
-            <p className="mt-4 text-sm text-dusty">Reading the scrolls…</p>
+            <p className="mt-4 text-sm text-dusty">{t.dashboard.loadingScrolls}</p>
           ) : dueToday.length === 0 ? (
-            <p className="mt-4 text-sm text-dusty">Nothing due today. The path is clear.</p>
+            <p className="mt-4 text-sm text-dusty">{t.dashboard.nothingDue}</p>
           ) : (
             <ul className="mt-4 space-y-2">
               {dueToday.map((item) => (
@@ -159,15 +166,15 @@ export default function DashboardPage() {
 
         <div className="papyrus-card p-6">
           <div className="flex items-center justify-between">
-            <h2 className="font-display text-lg text-gold">Recent quiz scores</h2>
+            <h2 className="font-display text-lg text-gold">{t.dashboard.recentQuizScores}</h2>
             <Link href="/quiz" className="text-xs text-dusty hover:text-gold">
-              View all
+              {t.common.viewAll}
             </Link>
           </div>
           {loading ? (
-            <p className="mt-4 text-sm text-dusty">Reading the scrolls…</p>
+            <p className="mt-4 text-sm text-dusty">{t.dashboard.loadingScrolls}</p>
           ) : recentAttempts.length === 0 ? (
-            <p className="mt-4 text-sm text-dusty">No quizzes taken yet. Start with a summary.</p>
+            <p className="mt-4 text-sm text-dusty">{t.dashboard.noQuizzes}</p>
           ) : (
             <ul className="mt-4 space-y-2">
               {recentAttempts.map((a) => (
@@ -188,11 +195,11 @@ export default function DashboardPage() {
 
       <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
         {[
-          { href: "/summary", label: "New summary" },
-          { href: "/quiz", label: "Take a quiz" },
-          { href: "/flashcards", label: "Review cards" },
-          { href: "/pomodoro", label: "Start focus" },
-          { href: "/mentor", label: "Ask Thoth" },
+          { href: "/summary", label: t.dashboard.quickActions.newSummary },
+          { href: "/quiz", label: t.dashboard.quickActions.takeQuiz },
+          { href: "/flashcards", label: t.dashboard.quickActions.reviewCards },
+          { href: "/pomodoro", label: t.dashboard.quickActions.startFocus },
+          { href: "/mentor", label: t.dashboard.quickActions.askThoth },
         ].map((a) => (
           <Link
             key={a.href}

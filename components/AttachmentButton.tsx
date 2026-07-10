@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { Plus, Loader2 } from "lucide-react";
+import { useI18n } from "@/components/I18nProvider";
 
 export type AttachedImage = {
   id: string;
@@ -57,6 +58,7 @@ export function AttachmentButton({
   disabled?: boolean;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const { t, fmt } = useI18n();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -67,7 +69,7 @@ export function AttachmentButton({
     try {
       for (const file of Array.from(files)) {
         if (file.size > 15 * 1024 * 1024) {
-          setError(`"${file.name}" is larger than 15MB — try a smaller file.`);
+          setError(fmt(t.attachment.tooLarge, { name: file.name }));
           continue;
         }
 
@@ -90,11 +92,11 @@ export function AttachmentButton({
           const text = await file.text();
           onTextExtracted(text, file.name);
         } else {
-          setError(`"${file.name}" isn't a supported file type.`);
+          setError(fmt(t.attachment.unsupported, { name: file.name }));
         }
       }
     } catch (err: any) {
-      setError(err.message || "Couldn't read that file.");
+      setError(err.message || t.attachment.readError);
     } finally {
       setBusy(false);
       if (inputRef.current) inputRef.current.value = "";
@@ -107,8 +109,8 @@ export function AttachmentButton({
         type="button"
         disabled={disabled || busy}
         onClick={() => inputRef.current?.click()}
-        title="Add images or files"
-        aria-label="Add images or files"
+        title={t.attachment.addFiles}
+        aria-label={t.attachment.addFiles}
         className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gold-dim text-gold transition hover:border-gold hover:bg-gold/10 disabled:opacity-50"
       >
         {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-5 w-5" />}
@@ -137,6 +139,7 @@ export function AttachmentThumbnails({
   images: AttachedImage[];
   onRemove: (id: string) => void;
 }) {
+  const { t } = useI18n();
   if (images.length === 0) return null;
   return (
     <div className="mb-2 flex flex-wrap gap-2">
@@ -147,9 +150,9 @@ export function AttachmentThumbnails({
           <button
             type="button"
             onClick={() => onRemove(img.id)}
-            className="absolute inset-0 flex items-center justify-center bg-obsidian/70 text-xs text-papyrus opacity-0 transition group-hover:opacity-100"
+            className="absolute inset-0 flex items-center justify-center bg-obsidian/70 text-xs text-papyrus opacity-0 transition group-hover:opacity-100 focus-visible:opacity-100"
           >
-            Remove
+            {t.common.remove}
           </button>
         </div>
       ))}

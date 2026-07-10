@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { AppShell } from "@/components/AppShell";
+import { useI18n } from "@/components/I18nProvider";
 import { format, isBefore, startOfToday } from "date-fns";
 import { Trash2 } from "lucide-react";
 
@@ -10,6 +11,7 @@ type Item = { id: string; title: string; due_date: string; status: "pending" | "
 
 export default function RevisionPage() {
   const supabase = createClient();
+  const { t, fmt } = useI18n();
   const [items, setItems] = useState<Item[]>([]);
   const [title, setTitle] = useState("");
   const [dueDate, setDueDate] = useState(format(new Date(), "yyyy-MM-dd"));
@@ -39,7 +41,7 @@ export default function RevisionPage() {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) {
-      setError("You must be signed in to schedule a revision.");
+      setError(t.revision.mustBeSignedIn);
       return;
     }
     const { error } = await supabase
@@ -70,14 +72,14 @@ export default function RevisionPage() {
 
   return (
     <AppShell>
-      <h1 className="font-display text-3xl text-papyrus">Revision Schedule</h1>
-      <p className="mt-1 text-dusty">Know exactly what's due for review, and when.</p>
+      <h1 className="font-display text-3xl text-papyrus">{t.revision.title}</h1>
+      <p className="mt-1 text-dusty">{t.revision.subtitle}</p>
 
       <form onSubmit={addItem} className="papyrus-card mt-8 flex flex-col gap-3 p-6 sm:flex-row">
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="What to revise, e.g. Chapter 4 formulas"
+          placeholder={t.revision.whatToRevisePlaceholder}
           className="flex-1 rounded-lg border border-obsidian-line bg-obsidian px-4 py-2.5 text-papyrus outline-none focus:border-gold"
         />
         <input
@@ -87,19 +89,19 @@ export default function RevisionPage() {
           className="rounded-lg border border-obsidian-line bg-obsidian px-4 py-2.5 text-papyrus outline-none focus:border-gold"
         />
         <button className="rounded-full bg-gold px-6 py-2.5 text-sm font-semibold text-ink hover:bg-gold-soft">
-          Schedule
+          {t.revision.schedule}
         </button>
       </form>
 
       {error && (
         <p className="mt-4 rounded-lg border border-fail bg-fail/5 px-4 py-2.5 text-sm text-fail">
-          Couldn&apos;t save that revision item: {error}
+          {fmt(t.revision.saveError, { error })}
         </p>
       )}
 
       <div className="mt-6 space-y-2">
         {items.length === 0 && (
-          <p className="text-sm text-dusty">Nothing scheduled yet. Add your first revision item above.</p>
+          <p className="text-sm text-dusty">{t.revision.nothingScheduled}</p>
         )}
         {items.map((item) => {
           const overdue = item.status === "pending" && isBefore(new Date(item.due_date), today);
@@ -124,7 +126,7 @@ export default function RevisionPage() {
               </label>
               <span className={`mr-4 text-xs ${overdue ? "text-fail" : "text-dusty"}`}>
                 {format(new Date(item.due_date), "MMM d, yyyy")}
-                {overdue && " · overdue"}
+                {overdue && ` · ${t.revision.overdue}`}
               </span>
               <button onClick={() => remove(item.id)} className="text-dusty hover:text-fail">
                 <Trash2 className="h-4 w-4" />

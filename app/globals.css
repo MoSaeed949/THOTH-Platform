@@ -211,3 +211,47 @@ body::before {
   transform: rotate(-90deg);
   transform-origin: 50% 50%;
 }
+
+/* ---------- Motion ---------- */
+
+/* Toast / dialog entrance */
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Subtle content reveal used on page sections */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.4s ease-out both;
+}
+
+/* ---------- RTL adjustments ---------- */
+
+/* Directional arrows baked into copy (→ / ←) should mirror in RTL so they keep
+   pointing "forward". Wrap such glyphs in .dir-flip. */
+[dir="rtl"] .dir-flip {
+  display: inline-block;
+  transform: scaleX(-1);
+}
+
+/* Recharts renders LTR internally; keep chart containers LTR for correct axis
+   placement even under an RTL document. */
+[dir="rtl"] .chart-ltr {
+  direction: ltr;
+}

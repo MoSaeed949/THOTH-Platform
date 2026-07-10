@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { AppShell } from "@/components/AppShell";
+import { useI18n } from "@/components/I18nProvider";
 import { Trash2, Plus } from "lucide-react";
 
 type Task = { title: string; done: boolean };
@@ -10,6 +11,7 @@ type Plan = { id: string; subject: string; tasks: Task[] };
 
 export default function StudyPlanPage() {
   const supabase = createClient();
+  const { t, fmt } = useI18n();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [subject, setSubject] = useState("");
   const [taskDrafts, setTaskDrafts] = useState<Record<string, string>>({});
@@ -66,18 +68,18 @@ export default function StudyPlanPage() {
 
   return (
     <AppShell>
-      <h1 className="font-display text-3xl text-papyrus">Study Plan</h1>
-      <p className="mt-1 text-dusty">Lay out what to study and when, subject by subject.</p>
+      <h1 className="font-display text-3xl text-papyrus">{t.studyPlan.title}</h1>
+      <p className="mt-1 text-dusty">{t.studyPlan.subtitle}</p>
 
       <form onSubmit={createPlan} className="papyrus-card mt-8 flex flex-col gap-3 p-6 sm:flex-row">
         <input
           value={subject}
           onChange={(e) => setSubject(e.target.value)}
-          placeholder="New subject, e.g. Linear Algebra"
+          placeholder={t.studyPlan.newSubjectPlaceholder}
           className="flex-1 rounded-lg border border-obsidian-line bg-obsidian px-4 py-2.5 text-papyrus outline-none focus:border-gold"
         />
         <button className="rounded-full bg-gold px-6 py-2.5 text-sm font-semibold text-ink hover:bg-gold-soft">
-          Add subject
+          {t.studyPlan.addSubject}
         </button>
       </form>
 
@@ -93,7 +95,7 @@ export default function StudyPlanPage() {
                 </button>
               </div>
               <p className="mt-1 text-xs text-dusty">
-                {done}/{plan.tasks.length} tasks complete
+                {fmt(t.studyPlan.tasksComplete, { done, total: plan.tasks.length })}
               </p>
 
               <ul className="mt-4 space-y-2">
@@ -121,7 +123,7 @@ export default function StudyPlanPage() {
                   value={taskDrafts[plan.id] || ""}
                   onChange={(e) => setTaskDrafts({ ...taskDrafts, [plan.id]: e.target.value })}
                   onKeyDown={(e) => e.key === "Enter" && addTask(plan)}
-                  placeholder="Add a task…"
+                  placeholder={t.studyPlan.addTaskPlaceholder}
                   className="flex-1 rounded-lg border border-obsidian-line bg-obsidian px-3 py-2 text-sm text-papyrus outline-none focus:border-gold"
                 />
                 <button

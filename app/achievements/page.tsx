@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { AppShell } from "@/components/AppShell";
+import { useI18n } from "@/components/I18nProvider";
 import { format } from "date-fns";
 
-type Def = { key: string; title: string; desc: string; check: (s: Stats) => boolean };
+type Def = { key: string; check: (s: Stats) => boolean };
 type Stats = {
   summaries: number;
   quizzes: number;
@@ -17,18 +18,19 @@ type Stats = {
 };
 
 const DEFS: Def[] = [
-  { key: "first_scroll", title: "First Scroll", desc: "Write your first summary.", check: (s) => s.summaries >= 1 },
-  { key: "trial_of_knowledge", title: "Trial of Knowledge", desc: "Take your first quiz.", check: (s) => s.quizzes >= 1 },
-  { key: "perfect_papyrus", title: "Perfect Papyrus", desc: "Score 100% on a quiz.", check: (s) => s.perfectScores >= 1 },
-  { key: "keeper_of_flame", title: "Keeper of the Flame", desc: "Complete 5 focus sessions.", check: (s) => s.pomodoros >= 5 },
-  { key: "three_suns", title: "Three Suns", desc: "Reach a 3-day streak.", check: (s) => s.streak >= 3 },
-  { key: "seven_suns", title: "Seven Suns", desc: "Reach a 7-day streak.", check: (s) => s.streak >= 7 },
-  { key: "architect_of_deck", title: "Architect of the Deck", desc: "Build a deck of 10+ flashcards.", check: (s) => s.maxDeckSize >= 10 },
-  { key: "master_planner", title: "Master Planner", desc: "Add 5+ tasks to a study plan.", check: (s) => s.maxPlanTasks >= 5 },
+  { key: "first_scroll", check: (s) => s.summaries >= 1 },
+  { key: "trial_of_knowledge", check: (s) => s.quizzes >= 1 },
+  { key: "perfect_papyrus", check: (s) => s.perfectScores >= 1 },
+  { key: "keeper_of_flame", check: (s) => s.pomodoros >= 5 },
+  { key: "three_suns", check: (s) => s.streak >= 3 },
+  { key: "seven_suns", check: (s) => s.streak >= 7 },
+  { key: "architect_of_deck", check: (s) => s.maxDeckSize >= 10 },
+  { key: "master_planner", check: (s) => s.maxPlanTasks >= 5 },
 ];
 
 export default function AchievementsPage() {
   const supabase = createClient();
+  const { t, fmt } = useI18n();
   const [unlocked, setUnlocked] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
 
@@ -106,8 +108,8 @@ export default function AchievementsPage() {
 
   return (
     <AppShell>
-      <h1 className="font-display text-3xl text-papyrus">Achievements</h1>
-      <p className="mt-1 text-dusty">Cartouches unlocked as your habits take hold.</p>
+      <h1 className="font-display text-3xl text-papyrus">{t.achievements.title}</h1>
+      <p className="mt-1 text-dusty">{t.achievements.subtitle}</p>
 
       <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
         {DEFS.map((d) => {
@@ -120,11 +122,11 @@ export default function AchievementsPage() {
               }`}
             >
               <div>
-                <h2 className="font-display text-lg text-gold">{d.title}</h2>
-                <p className="text-sm text-dusty">{d.desc}</p>
+                <h2 className="font-display text-lg text-gold">{t.achievements.defs[d.key as keyof typeof t.achievements.defs].title}</h2>
+                <p className="text-sm text-dusty">{t.achievements.defs[d.key as keyof typeof t.achievements.defs].desc}</p>
                 {isUnlocked && (
                   <p className="mt-1 text-xs text-gold-dim">
-                    Unlocked {format(new Date(unlocked[d.key]), "MMM d, yyyy")}
+                    {fmt(t.achievements.unlockedOn, { date: format(new Date(unlocked[d.key]), "MMM d, yyyy") })}
                   </p>
                 )}
               </div>
@@ -132,7 +134,7 @@ export default function AchievementsPage() {
           );
         })}
       </div>
-      {loading && <p className="mt-6 text-sm text-dusty">Reading the cartouches…</p>}
+      {loading && <p className="mt-6 text-sm text-dusty">{t.achievements.loading}</p>}
     </AppShell>
   );
 }
